@@ -1,5 +1,30 @@
 # Linux
 
+- 命令模式下ctrl组合键
+
+    - ctrl + r ： 输入关键字可弹出曾经用过的指令
+    
+        > 反向搜索执行过的命令。(reverse-i-search) 
+        
+        > 等同于history|grep xxx 
+    
+    - ctrl + k ： 剪切光标及其后边的内容
+    
+    - ctrl + u ： 剪切光标之前的内容
+    
+    - ctrl + y ： 在光标处粘贴上两个命令，粘贴方式和被剪切方式相同
+    
+    - ctrl + c ： 结束正在运行的程序或命令
+    
+    - ctrl + d ： 结束当前命令窗口
+    
+    - ctrl + l ： 清屏；（和clear效果相同）
+    
+    - ctrl + a ： 光标切换到行开头；
+    
+    - ctrl + e ： 光标切换到行尾；
+
+
 - hostname hostnamectl
 
     >  查看主机名称
