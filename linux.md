@@ -88,7 +88,7 @@
     - TX：发送流量
     - RX：接收流量
     - TOTAL：总流量
-    - Cumm：运行iftop到目前时间的总流量
+    - Cum：运行iftop到目前时间的总流量
     - peak：流量峰值
     - rates：分别表示过去 2s 10s 40s 的平均流量
 
