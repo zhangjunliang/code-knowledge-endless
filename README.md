@@ -11,7 +11,7 @@
 
 ## [算法 + 数据结构](./algorithm.md)
 
-## [linux](/linux.md)
+## [linux](./linux.md)
 
 1. docker
     

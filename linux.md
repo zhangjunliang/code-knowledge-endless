@@ -1,5 +1,16 @@
 # Linux
 
+- hostname hostnamectl
+
+    >  查看主机名称
+                         
+    ```
+    # 永久修改主机名称
+    sudo hostnamectl set-hostname <newhostname>
+    # 临时修改注意名称
+    sudo hostname <new-hostname>
+    ```
+                         
 - nohup 
     
     > nohup命令可以将以忽略挂起信号的方式运行起来，被运行的程序的输出信息将不会显示到终端。
