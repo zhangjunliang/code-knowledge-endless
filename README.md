@@ -13,12 +13,14 @@
 
 ## [linux](./linux.md)
 
-1. docker
+- [read more](https://github.com/zhangjunliang/python-package)
+
+- docker
     
 
 ## 语言
 
-1. [python](https://github.com/zhangjunliang/python-package)
+- [python](https://github.com/zhangjunliang/python-package)
     
     - [read more](https://github.com/zhangjunliang/python-package)
         
@@ -27,14 +29,14 @@
 ## 数据
 
 
-1. [mysql](./mysql.md) 
+- [mysql](./mysql.md) 
     
     - [read more](./mysql.md)
 
     > MySQL 是最流行的关系型数据库管理系统，在 WEB 应用方面 MySQL 是最好的
       RDBMS(Relational Database Management System：关系数据库管理系统)应用软件之一。
 
-2. [redis](./redis.md) 
+- [redis](./redis.md) 
 
     - [read more](./redis.md)
 
