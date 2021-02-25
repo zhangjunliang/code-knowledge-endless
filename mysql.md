@@ -1,4 +1,14 @@
 # Mysql
+
+- 查看MySql状态及变量
+
+    - Mysql> show status ——显示状态信息（扩展show status like 'XXX'）
+    - Mysql> show variables ——显示系统变量（扩展show variables like 'XXX'）
+    - Mysql> show innodb status ——显示InnoDB存储引擎的状态
+    - Shell> mysqladmin variables -u username -p password——显示系统变量
+    - Shell> mysqladmin extended-status -u username -p password——显示状态信息
+    - Shell> mysqld --verbose --help [|more #逐行显示] ——查看状态变量及帮助
+
 ## 数据库事务:ACID
     
 - 原子性(Atomicity) 
@@ -516,6 +526,140 @@
         https://www.cnblogs.com/wy123/p/12724252.html
         https://mp.weixin.qq.com/s/Lc_tQEK55r_syapebSu0Cg
         https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_lock_wait_timeout
+
+####  调优设置
+- 有关请求连接的变量
+
+    - max_connections 
+    
+        > 指MySql的最大连接数，如果服务器的并发连接请求量比较大，建议调高此值，以增加并行连接数量，
+        当然这建立在机器能支撑的情况下，因为如果连接数越多，介于MySql会为每个连接提供连接缓冲区，
+        就会开销越多的内存，所以要适当调整该值，不能盲目提高设值。
+        可以过'conn%'通配符查看当前状态的连接数量，以定夺该值的大小
+
+    - back_log 
+    
+        > 是指要求MySQL能有的连接数量。当主要MySQL线程在一个很短时间内得到非常多的连接请求，
+        这就起作用，然后主线程花些时间(尽管很短)检查连接并且启动一个新线程。
+        back_log值指出在MySQL暂时停止回答新请求之前的短时间内多少个请求可以被存在堆栈中。
+        如果期望在一个短时间内有很多连接，你需要增加它。
+        也就是说，如果MySql的连接数据达到max_connections时，
+        新来的请求将会被存在堆栈中，以等待某一连接释放资源，该堆栈的数量即back_log，
+        如果等待连接的数量超过back_log，将不被授予连接资源。
+        另外，这值（back_log）限于您的操作系统对到来的TCP/IP连接的侦听队列的大小。
+        你的操作系统在这个队列大小上有它自己的限制（可以检查你的OS文档找出这个变量的最大值），
+        试图设定back_log高于你的操作系统的限制将是无效的。
+
+- 缓冲区变量
+
+    > 来看看那些在启动时就需要分配并且总是存在的全局缓冲
+
+    - 全局缓冲  
+    
+        - key_buffer_size
+            > 决定索引处理的速度，尤其是索引读的速度。一般我们设为16M，通过检查状态值Key_read_requests和Key_reads，
+            可以知道key_buffer_size设置是否合理。比例key_reads/key_read_requests应该尽可能的低，
+            至少是1:100，1:1000更好（上述状态值可以使用'key_read%'获得用来显示状态数据）。
+            key_buffer_size只对MyISAM表起作用。即使你不使用MyISAM表，但是内部的临时磁盘表是MyISAM表，也要使用该值。
+            可以使用检查状态值'created_tmp_disk_tables'得知详情。
+
+        - innodb_buffer_pool_size
+        
+            > 对于InnoDB表来说，作用就相当于key_buffer_size对于MyISAM表的作用一样。
+            InnoDB使用该参数指定大小的内存来缓冲数据和索引。
+            对于单独的MySQL数据库服务器，最大可以把该值设置成物理内存的80%。
+
+        - innodb_additional_mem_pool_size
+            
+            > 指定InnoDB用来存储数据字典和其他内部数据结构的内存池大小。缺省值是1M。
+             通常不用太大，只要够用就行，应该与表结构的复杂度有关系。
+             如果不够用，MySQL会在错误日志中写入一条警告信息。
+            
+        - innodb_log_buffer_size
+        
+            > 指定InnoDB用来存储日志数据的缓存大小，如果您的表操作中包含大量并发事务（或大规模事务），
+            并且在事务提交前要求记录日志文件，请尽量调高此项值，以提高日志效率。
+
+        - query_cache_size
+        
+            > 是MySql的查询缓冲大小。（从4.0.1开始，MySQL提供了查询缓冲机制）使用查询缓冲，
+            MySQL将SELECT语句和查询结果存放在缓冲区中，今后对于同样的SELECT语句（区分大小写），
+            将直接从缓冲区中读取结果。根据MySQL用户手册，使用查询缓冲最多可以达到238%的效率。
+            通过检查状态值’Qcache_%’，可以知道query_cache_size设置是否合理：
+            如果Qcache_lowmem_prunes的值非常大，则表明经常出现缓冲不够的情况，
+            如果Qcache_hits的值也非常大，则表明查询缓冲使用非常频繁，此时需要增加缓冲大小；
+            如果Qcache_hits的值不大，则表明你的查询重复率很低，
+            这种情况下使用查询缓冲反而会影响效率，那么可以考虑不用查询缓冲。
+            此外，在SELECT语句中加入SQL_NO_CACHE可以明确表示不使用查询缓冲。
+
+        > 注：如果你大量地使用MyISAM表，那么你也可以增加操作系统的缓存空间使得MySQL也能用得着。
+        把这些也都加到操作系统和应用程序所需的内存值之中，可能需要增加32MB甚至更多的内存给MySQL服务器代码以及各种不同的小静态缓冲。
+        这些就是你需要考虑的在MySQL服务器启动时所需的内存。其他剩下的内存用于连接。
+
+    - 连接缓冲:MySql为每个连接发放连接缓冲
+
+        > 每个连接到MySQL服务器的线程都需要有自己的缓冲。大概需要立刻分配256K，甚至在线程空闲时，
+        它们使用默认的线程堆栈，网络缓存等。事务开始之后，则需要增加更多的空间。
+        运行较小的查询可能仅给指定的线程增加少量的内存消耗，然而如果对数据表做复杂的操作例如扫描、排序或者需要临时表，
+        则需分配大约read_buffer_size，sort_buffer_size，read_rnd_buffer_size，tmp_table_size 大小的内存空间。
+        不过它们只是在需要的时候才分配，并且在那些操作做完之后就释放了。有的是立刻分配成单独的组块。
+        tmp_table_size 可能高达MySQL所能分配给这个操作的最大内存空间了。注意，这里需要考虑的不只有一点,
+        可能会分配多个同一种类型的缓存，例如用来处理子查询。一些特殊的查询的内存使用量可能更大,如果在MyISAM表
+        上做成批的插入时需要分配 bulk_insert_buffer_size 大小的内存；
+        执行 ALTER TABLE， OPTIMIZE TABLE， REPAIR TABLE 命令时需要分配 myisam_sort_buffer_size 大小的内存。
+
+        - read_buffer_size 
+        
+        > MySql读入缓冲区大小。对表进行顺序扫描的请求将分配一个读入缓冲区，MySql会为它分配一段内存缓冲区。
+        read_buffer_size变量控制这一缓冲区的大小。如果对表的顺序扫描请求非常频繁，并且你认为频繁扫描进行得太慢，
+        可以通过增加该变量值以及内存缓冲区大小提高其性能。
+
+        - sort_buffer_size 
+        > MySql执行排序使用的缓冲大小。如果想要增加ORDER BY的速度，首先看是否可以让MySQL使用索引而不是额外的排序阶段。
+        如果不能，可以尝试增加sort_buffer_size变量的大小
+
+        - read_rnd_buffer_size 
+        > MySql的随机读缓冲区大小。当按任意顺序读取行时(例如，按照排序顺序)，将分配一个随机读缓存区。
+        进行排序查询时，MySql会首先扫描一遍该缓冲，以避免磁盘搜索，提高查询速度，如果需要排序大量数据，
+        可适当调高该值。但MySql会为每个客户连接发放该缓冲空间，所以应尽量适当设置该值，以避免内存开销过大。
+
+        - tmp_table_size
+        > MySql的heap （堆积）表缓冲大小。所有联合在一个DML指令内完成，并且大多数联合甚至可以不用临时表即可以完成。
+        大多数临时表是基于内存的(HEAP)表。具有大的记录长度的临时表 (所有列的长度的和)或包含BLOB列的表存储在硬盘上。
+        如果某个内部heap（堆积）表大小超过tmp_table_size，MySQL可以根据需要自动将内存中的heap表改为基于硬盘的MyISAM表。
+        还可以通过设置tmp_table_size选项来增加临时表的大小。也就是说，如果调高该值，MySql同时将增加heap表的大小，
+        可达到提高联接查询速度的效果。
+
+    > 当我们设置好了缓冲区大小之后，再来看看
+
+    - table_cache/table_open_cache[版本5.1.3之后的名称二者作用相同]
+        >主要用于设置table高速缓存的数量。由于每个客户端连接都会至少访问一个表，因此此参数的值与max_connections有关。
+        所有线程打开的表的数目，增大该值可以增加mysqld需要的文件描述符的数量。
+        每当MySQL访问一个表时，如果在表缓冲区中还有空间，该表就被打开并放入其中，这样可以更快地访问表内容。
+        通过检查峰值时间的状态值’Open_tables’和’Opened_tables’，可以决定是否需要增加table_cache的值。
+        如果你发现open_tables等于table_cache，并且opened_tables在不断增长，
+        那么你就需要增加table_cache的值了（上述状态值可以使用’Open%tables’获得）。
+        注意，不能盲目地把table_cache设置成很大的值。如果设置得太高，可能会造成文件描述符不足，从而造成性能不稳定或者连接失败。
+        如果对此参数的把握不是很准，比较保守的设置建议：把MySQL数据库放在生产环境中试运行一段时间，
+        然后把参数的值调整得比Opened_tables的数值大一些，并且保证在比较高负载的极端条件下依然比Opened_tables略大
+
+    - 其他
+
+    > 只有简单查询OLTP（联机事务处理）应用的内存消耗经常是使用默认缓冲的每个线程小于1MB，除非需要使用复杂的查询否则无需增加每个线程的缓冲大小。
+    使用1MB的缓冲来对10行记录进行排序和用16MB的缓冲基本是一样快的（实际上16MB可能会更慢，不过这是其他方面的事了）。
+
+    > 找出MySQL服务器内存消耗的峰值。就比较能计算出操作系统所需的内存、文件缓存以及其他应用。
+    在32位环境下，还需要考虑到32位的限制，限制 “mysqld” 的值大约为2.5G（实际上还要考虑到很多其他因素）。
+    现在运行 “ps aux” 命令来查看 “VSZ” 的值（MySQL 进程分配的虚拟内存）。
+    监视着内存变化的值，就能知道是需要增加或减少当前的内存值了。
+
+    - 设置方法：
+    
+        > 安装好MySql后，配制文件应该在MySql安装目录下的./share/mysql目录中，配制文件：
+            my-huge.cnf my-medium.cnf my-large.cnf my-small.cnf
+        win环境下即存在于MySql安装目录中的.ini文件。不同的流量的网站和不同配制的服务器环境，当然需要有不同的配制文件了。
+            一般的情况下，my-medium.cnf这个配制文件就能满足我们的大多需要；
+            一般我们会把配置文件拷贝到 /etc/my.cnf ，win环境下则拷备到 my.ini 下即可，只需要修改这个配置文件就可以了。
 
 ## 其他
 
