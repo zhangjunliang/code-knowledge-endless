@@ -1,6 +1,5 @@
 # Redis
-- 哨兵模式
-- 持久化
+
 - 数据类型
     - string 字符串：最基本的数据类型，二进制安全的字符串，最大512M
     - hash 哈希
@@ -38,3 +37,7 @@
     - graphicsmagick提供类似GraphicsMagick的图片处理功能，从此生成缩略图，打水印都可以在Redis里做了
     - redablooms基于RedisString的Bloom filter，可以用于ID生成
     - password提供加密的密码存储
+
+- 哨兵模式
+
+- 持久化
