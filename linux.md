@@ -1,5 +1,5 @@
 # Linux
-
+  www.baidu.com                    百度网址
 - 命令模式下ctrl组合键
 
     - ctrl + r ： 输入关键字可弹出曾经用过的指令
