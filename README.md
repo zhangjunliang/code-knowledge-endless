@@ -15,7 +15,7 @@
 
 ## [linux](./linux.md)
 
-- [read more](https://github.com/zhangjunliang/python-package)
+- [read more](./linux.md)
 
 - docker
     

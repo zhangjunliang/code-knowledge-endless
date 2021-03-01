@@ -1,7 +1,11 @@
 # Redis
 <<<<<<< HEAD
+<<<<<<< HEAD
 - 哨兵模式
 - 持久化
+=======
+
+>>>>>>> c0379e83b110c1bd30c6cf803040b99817e8f088
 - 数据类型
 =======
 
@@ -43,3 +47,7 @@
     - graphicsmagick提供类似GraphicsMagick的图片处理功能，从此生成缩略图，打水印都可以在Redis里做了
     - redablooms基于RedisString的Bloom filter，可以用于ID生成
     - password提供加密的密码存储
+
+- 哨兵模式
+
+- 持久化
