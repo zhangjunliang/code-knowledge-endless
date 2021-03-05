@@ -14,13 +14,17 @@
         yum install -y docker-ce docker-ce-cli containerd.io
 
      启动docker
-        systemctl enable docker
-
+        systemctl start docker 
+        
      允许开机启动
-        systemctl start docker  
+        systemctl enable docker  
   ```
 - 二、
     - 2.1
+  > docker 如何从库中拉取镜像:
+     ```
+        docker pull  所需要的组件名:版本号
+     ```
   > docker 如何从docker容器中，将现有的docker容器镜像提交到 docker images:
      ```
         docker commit 容器id 版本号:镜像名
