@@ -17,7 +17,7 @@
 
 - [read more](./linux.md)
 
-- [docker](./docker_jichu.md)
+- [docker](./docker.md)
     
 
 ## 语言
