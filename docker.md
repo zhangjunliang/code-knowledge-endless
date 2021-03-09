@@ -32,17 +32,17 @@
     ```
     docker commit 容器id 版本号:镜像名
     ```
-- 将指定镜像保存成 tar 归档文件
+- 将指定镜像保存成 tar 归档文件 并直接压缩
     ```
-    docker save -o  镜像名  镜像id
+    docker save redis:test |gzip > test.tar.gz
     ```
 -  导入使用 docker save 命令导出的镜像
     ```
-    docker load -i  镜像名  版本号:镜像名
+    docker load < test.tar.gz
     ``` 
 -  标记本地镜像，将其归入某一仓库。
     ```
-    docker tag 镜像id 镜像名称:版本号
+    docker tag redis:test project/redis:v1
     ```  
 
 - 停止
