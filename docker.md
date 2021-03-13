@@ -36,7 +36,7 @@
     ```
     docker save redis:test |gzip > test.tar.gz
     ```
--  导入使用 docker save 命令导出的镜像
+-  导入使用 docker load 命令导入镜像
     ```
     docker load < test.tar.gz
     ``` 
